@@ -3,6 +3,7 @@
     "name": "Air Max 270",
     "brand": "Nike",
     "price": 16,
+    "quantity": 5,
     "description": "The Nike Air Max 270 combines modern comfort with a throwback style inspired by the Air Max 180 and Air Max 93.",
     "image_url": "https://img.freepik.com/free-psd/running-shoes-sneakers-transparent-background_84443-1654.jpg?t=st=1716454923~exp=1716458523~hmac=b92da332b8a1f96366f25dffb2f1ece13d842e4afe9417b21e94e4009f93b09c&w=1480"
   },
@@ -10,6 +11,7 @@
     "name": "Chuck Taylor All Star",
     "brand": "Converse",
     "price": 50,
+    "quantity": 7,
     "description": "Converse Chuck Taylor All Star sneakers are an all-time classic, offering a durable canvas upper and the iconic rubber toe cap.",
     "image_url": "https://img.freepik.com/free-psd/running-shoes-sneakers-transparent-background_84443-1652.jpg?t=st=1716455007~exp=1716458607~hmac=af9444d4ad6e512ec5536161b170df2e38eb9e88746863bf39c538aff9e2d986&w=1480"
   },
@@ -17,6 +19,7 @@
     "name": "shoe366",
     "brand": "shoe366",
     "price": 64000,
+    "quantity": 16,
     "description": "ggggggggggg",
     "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiEnx_JNG32iyrhiMeWLm2gndAxWHYGTij6etk5ltEGOHA52H1wMBXgnXTGg&s"
   },
@@ -24,6 +27,7 @@
     "name": "Classic Leather",
     "brand": "Reebok",
     "price": 75,
+    "quantity": 6,
     "description": "Reebok's Classic Leather sneakers are timeless icons, offering everyday comfort and a sleek look with their soft leather upper.",
     "image_url": "https://img.freepik.com/free-psd/running-shoes-sneakers-transparent-background_84443-1659.jpg?t=st=1716454935~exp=1716458535~hmac=6e3b9b287577c5006087b1d65aa8d14583b60fb12f383e77c2563e3262aa46ce&w=1480"
   }
