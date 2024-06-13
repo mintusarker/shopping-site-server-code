@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 require("dotenv").config();
 
@@ -27,29 +27,32 @@ async function run() {
 
     const productsCollection = client.db("userProduct").collection("products");
 
-
-    app.get('/products', async(req, res)=> {
-        const result = await productsCollection.find({}).toArray();
-        res.send(result)
+    app.get("/products", async (req, res) => {
+      const result = await productsCollection.find({}).toArray();
+      res.send(result);
     });
 
-
-    app.post('/products', async (req,res)=> {
-        const product = req.body;
-        console.log(product);
-        const result  = await productsCollection.insertOne(product);
-        res.send(result)
-    })
-
-
-    app.delete('/products/:id', async (req, res)=>{
-        const id = req.params.id;
-        const filter = {_id: id};
-        const result = await productsCollection.deleteOne(filter);
-        res.send(result)
+    app.get("/product", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      console.log(query);
+      const result = await productsCollection.find(query).toArray();
+      res.send(result);
     });
 
+    app.post("/products", async (req, res) => {
+      const product = req.body;
+      console.log(product);
+      const result = await productsCollection.insertOne(product);
+      res.send(result);
+    });
 
+    app.delete("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const result = await productsCollection.deleteOne(filter);
+      res.send(result);
+    });
   } finally {
   }
 }
@@ -62,6 +65,3 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
-
-
-
