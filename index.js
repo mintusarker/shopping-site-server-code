@@ -1,8 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
-
+var jwt = require("jsonwebtoken");
 require("dotenv").config();
+
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
 
@@ -20,6 +22,24 @@ const client = new MongoClient(uri, {
   },
 });
 
+//jwt common function
+function verifyJWT(req, res, next) {
+  const authHeader = req.headers.authorization;
+  console.log(authHeader);
+  if (!authHeader) {
+    return res.status(401).send("unauthorized access");
+  }
+  const token = authHeader.split(" ")[1];
+  console.log(token);
+  jwt.verify(token, process.env.ACCESS_TOKEN, function (err, decoded) {
+    if (err) {
+      return res.status(403).send({ message: "forbidden access" });
+    }
+    req.decoded = decoded;
+    next();
+  });
+}
+
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -32,6 +52,16 @@ async function run() {
     app.get("/products", async (req, res) => {
       const result = await productsCollection.find({}).toArray();
       res.send(result);
+    });
+
+    //jwt
+    app.post("/jwt", async (req, res) => {
+      const user = req.body;
+      console.log(user);
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN, {
+        expiresIn: "1h",
+      });
+      res.send({ token });
     });
 
     //get product by email
@@ -52,7 +82,7 @@ async function run() {
     });
 
     //add product
-    app.post("/products", async (req, res) => {
+    app.post("/products", verifyJWT, async (req, res) => {
       const product = req.body;
       console.log(product);
       const result = await productsCollection.insertOne(product);
@@ -60,7 +90,7 @@ async function run() {
     });
 
     //update product
-    app.put("/products/:id", async (req, res) => {
+    app.put("/products/:id", verifyJWT, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const product = req.body;
@@ -83,7 +113,7 @@ async function run() {
     });
 
     //delete product
-    app.delete("/products/:id", async (req, res) => {
+    app.delete("/products/:id", verifyJWT, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const result = await productsCollection.deleteOne(filter);
@@ -91,7 +121,7 @@ async function run() {
     });
 
     //booking
-    app.post("/bookings", async (req, res) => {
+    app.post("/bookings", verifyJWT, async (req, res) => {
       const booking = req.body;
       console.log(booking);
       const result = await bookingsCollection.insertOne(booking);
@@ -99,56 +129,63 @@ async function run() {
     });
 
     //get bookings by email
-    app.get('/bookings', async (req, res) => {
+    app.get("/bookings", async (req, res) => {
       const email = req.query.email;
-      const query = { email: email }
+      const query = { email: email };
       const bookings = await bookingsCollection.find(query).toArray();
       res.send(bookings);
-  });
+    });
 
     //get booking by id for payment
-    app.get('/bookings/:id', async (req, res) => {
+    app.get("/bookings/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { _id: ObjectId(id) };
+      const query = { _id: new ObjectId(id) };
       const booking = await bookingsCollection.findOne(query);
       res.send(booking);
-  })
+    });
+
+    //delete bookings
+    app.delete("/bookings/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const result = await bookingsCollection.deleteOne(filter);
+      res.send(result);
+    });
 
     //payment method ----stripe
-    app.post('/create-payment-intent', async (req, res) => {
+    app.post("/create-payment-intent", verifyJWT, async (req, res) => {
       const booking = req.body;
-      console.log(booking)
+      console.log(booking);
       const price = booking.price;
       const amount = price * 100;
 
       const paymentIntent = await stripe.paymentIntents.create({
-          currency: 'usd',
-          amount: amount,
-          "payment_method_types": [
-              "card"
-          ],
+        currency: "usd",
+        amount: amount,
+        payment_method_types: ["card"],
       });
       res.send({
-          clientSecret: paymentIntent.client_secret,
+        clientSecret: paymentIntent.client_secret,
       });
-  })
+    });
 
-  app.post('/payments', async (req, res) => {
+    app.post("/payments", verifyJWT, async (req, res) => {
       const payment = req.body;
       const result = await paymentsCollection.insertOne(payment);
       const id = payment.bookingId;
-      const filter = { _id: ObjectId(id) };
+      const filter = { _id: new ObjectId(id) };
       const updatedDoc = {
-          $set: {
-              paid: true,
-              transactionId: payment.transactionId
-          }
-      }
-      const updatedResult = await bookingsCollection.updateOne(filter, updatedDoc);
+        $set: {
+          paid: true,
+          transactionId: payment.transactionId,
+        },
+      };
+      const updatedResult = await bookingsCollection.updateOne(
+        filter,
+        updatedDoc
+      );
       res.send(result);
-  })
-
-
+    });
   } finally {
   }
 }
