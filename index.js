@@ -49,20 +49,48 @@ async function run() {
     const bookingsCollection = client.db("userProduct").collection("bookings");
     const paymentsCollection = client.db("userProduct").collection("payments");
 
+    //get all products
     app.get("/products", async (req, res) => {
       const result = await productsCollection.find({}).toArray();
       res.send(result);
     });
 
-
-    //get product for completed payment by email
-    app.get('/paymentDone', async (req, res) => {
-      const email = req.query.email
-      const query = {email : email}
+    //get product for payment completed by email
+    app.get("/paymentDone", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
       const result = await paymentsCollection.find(query).toArray();
-      res.send(result)
+      res.send(result);
     });
 
+    //search API
+    app.get("/search/:key", async (req, res) => {
+      const data = await productsCollection
+        .find({
+          $or: [
+            {
+              name: { $regex: req.params.key },
+            },
+          ],
+        })
+        .toArray();
+      res.send(data);
+    });
+
+    //search Api
+    // app.get("/search/:key", async (req, res) => {
+    //   const product = await ProductCollection.find({
+    //     $or: [
+    //       {
+    //         category: { $regex: req.params.key },
+    //       },
+    //       {
+    //         brand: { $regex: req.params.key },
+    //       },
+    //     ],
+    //   }).toArray();
+    //   res.send(product);
+    // });
     //jwt
     app.post("/jwt", async (req, res) => {
       const user = req.body;
