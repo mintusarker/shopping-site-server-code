@@ -48,6 +48,7 @@ async function run() {
     const productsCollection = client.db("userProduct").collection("products");
     const bookingsCollection = client.db("userProduct").collection("bookings");
     const paymentsCollection = client.db("userProduct").collection("payments");
+    const usersCollection = client.db("userProduct").collection("users");
 
     //get all products
     app.get("/products", async (req, res) => {
@@ -77,20 +78,6 @@ async function run() {
       res.send(data);
     });
 
-    //search Api
-    // app.get("/search/:key", async (req, res) => {
-    //   const product = await ProductCollection.find({
-    //     $or: [
-    //       {
-    //         category: { $regex: req.params.key },
-    //       },
-    //       {
-    //         brand: { $regex: req.params.key },
-    //       },
-    //     ],
-    //   }).toArray();
-    //   res.send(product);
-    // });
     //jwt
     app.post("/jwt", async (req, res) => {
       const user = req.body;
@@ -99,6 +86,32 @@ async function run() {
         expiresIn: "1h",
       });
       res.send({ token });
+    });
+
+    //get admin email
+    app.get("/users/admin/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const user = await usersCollection.findOne(query);
+      res.send({ isAdmin: user?.role === "Admin" });
+    });
+
+    //save user to database
+    app.put("/users", async (req, res) => {
+      const user = req.body;
+      const email = user.email;
+
+      const filter = { email: email };
+      const option = { upsert: true };
+
+      const userinfo = {
+        email: user.email,
+        name: user.name,
+      };
+
+      const updateDoc = { $set: userinfo };
+      const result = await usersCollection.updateOne(filter, updateDoc, option);
+      res.send(result);
     });
 
     //get product by email
