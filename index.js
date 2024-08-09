@@ -114,6 +114,20 @@ async function run() {
       res.send(result);
     });
 
+    //get users
+    app.get("/users", async (req, res) => {
+      const result = await usersCollection.find({}).toArray();
+      res.send(result);
+    });
+
+    //delete user
+    app.delete("/user/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await usersCollection.deleteOne(query);
+      res.send(result);
+    });
+
     //get product by email
     app.get("/product", async (req, res) => {
       const email = req.query.email;
