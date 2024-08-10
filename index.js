@@ -49,6 +49,12 @@ async function run() {
     const bookingsCollection = client.db("userProduct").collection("bookings");
     const paymentsCollection = client.db("userProduct").collection("payments");
     const usersCollection = client.db("userProduct").collection("users");
+    const newArrivalCollection = client
+      .db("userProduct")
+      .collection("new-producrts");
+    const topSellingCollection = client
+      .db("userProduct")
+      .collection("top-selling");
 
     //get all products
     app.get("/products", async (req, res) => {
@@ -128,15 +134,6 @@ async function run() {
       res.send(result);
     });
 
-    //get product by email
-    app.get("/product", async (req, res) => {
-      const email = req.query.email;
-      const query = { email: email };
-      console.log(query);
-      const result = await productsCollection.find(query).toArray();
-      res.send(result);
-    });
-
     //get by id
     app.get("/products/:id", async (req, res) => {
       const id = req.params.id;
@@ -213,6 +210,32 @@ async function run() {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const result = await bookingsCollection.deleteOne(filter);
+      res.send(result);
+    });
+
+    //store new arrival products
+    app.post("/new-arrival", async (req, res) => {
+      const newProduct = req.body;
+      const result = await newArrivalCollection.insertOne(newProduct);
+      res.send(result);
+    });
+
+    //get new arrival product
+    app.get("/new-arrival", async (req, res) => {
+      const result = await newArrivalCollection.find({}).toArray();
+      res.send(result);
+    });
+
+    //store top selling product
+    app.post("/top-selling", async (req, res) => {
+      const topSellProducts = req.body;
+      const result = await topSellingCollection.insertOne(topSellProducts);
+      res.send(result);
+    });
+
+    //get top selling products
+    app.get("/top-selling", async (req, res) => {
+      const result = await topSellingCollection.find({}).toArray();
       res.send(result);
     });
 
