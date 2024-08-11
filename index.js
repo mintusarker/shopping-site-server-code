@@ -51,7 +51,7 @@ async function run() {
     const usersCollection = client.db("userProduct").collection("users");
     const newArrivalCollection = client
       .db("userProduct")
-      .collection("new-producrts");
+      .collection("new-products");
     const topSellingCollection = client
       .db("userProduct")
       .collection("top-selling");
@@ -189,8 +189,14 @@ async function run() {
       res.send(result);
     });
 
-    //get bookings by email
+    //get all booking
     app.get("/bookings", async (req, res) => {
+      const result = await bookingsCollection.find({}).toArray();
+      res.send(result);
+    });
+
+    //get bookings by email
+    app.get("/bookings/email", async (req, res) => {
       const email = req.query.email;
       const query = { email: email };
       const bookings = await bookingsCollection.find(query).toArray();
@@ -206,7 +212,7 @@ async function run() {
     });
 
     //delete bookings
-    app.delete("/bookings/:id", verifyJWT, async (req, res) => {
+    app.delete("/bookings/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const result = await bookingsCollection.deleteOne(filter);
@@ -226,6 +232,14 @@ async function run() {
       res.send(result);
     });
 
+    //delete new arrival
+    app.delete("/new-arrival/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const result = await newArrivalCollection.deleteOne(filter);
+      res.send(result);
+    });
+
     //store top selling product
     app.post("/top-selling", async (req, res) => {
       const topSellProducts = req.body;
@@ -236,6 +250,14 @@ async function run() {
     //get top selling products
     app.get("/top-selling", async (req, res) => {
       const result = await topSellingCollection.find({}).toArray();
+      res.send(result);
+    });
+
+    //delete top selling products
+    app.delete("/top-selling/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const result = await topSellingCollection.deleteOne(filter);
       res.send(result);
     });
 
