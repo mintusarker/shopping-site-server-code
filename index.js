@@ -43,18 +43,17 @@ function verifyJWT(req, res, next) {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    // await client.connect();
+    await client.connect();
 
     const productsCollection = client.db("userProduct").collection("products");
     const bookingsCollection = client.db("userProduct").collection("bookings");
     const paymentsCollection = client.db("userProduct").collection("payments");
-    const usersCollection = client.db("userProduct").collection("users");
     const newArrivalCollection = client
       .db("userProduct")
-      .collection("new-products");
+      .collection("newProducts");
     const topSellingCollection = client
       .db("userProduct")
-      .collection("top-selling");
+      .collection("topSelling");
 
     //get all products
     app.get("/products", async (req, res) => {
@@ -232,11 +231,12 @@ async function run() {
       res.send(result);
     });
 
-    //delete new arrival
+    // //delete new arrival
     app.delete("/new-arrival/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const result = await newArrivalCollection.deleteOne(filter);
+      console.log(result);
       res.send(result);
     });
 
@@ -247,13 +247,13 @@ async function run() {
       res.send(result);
     });
 
-    //get top selling products
+    //get top selling product
     app.get("/top-selling", async (req, res) => {
       const result = await topSellingCollection.find({}).toArray();
       res.send(result);
     });
 
-    //delete top selling products
+    //delete top selling product
     app.delete("/top-selling/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
