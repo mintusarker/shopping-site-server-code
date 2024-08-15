@@ -218,6 +218,7 @@ async function run() {
       res.send(result);
     });
 
+    //new arrival
     //store new arrival products
     app.post("/new-arrival", async (req, res) => {
       const newProduct = req.body;
@@ -231,6 +232,14 @@ async function run() {
       res.send(result);
     });
 
+    //get new arrival products by id
+    app.get("/newArrival/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await newArrivalCollection.find(query).toArray();
+      res.send(result);
+    });
+
     // //delete new arrival
     app.delete("/new-arrival/:id", async (req, res) => {
       const id = req.params.id;
@@ -239,6 +248,7 @@ async function run() {
       res.send(result);
     });
 
+    //top selling
     //store top selling product
     app.post("/top-selling", async (req, res) => {
       const topSellProducts = req.body;
@@ -249,6 +259,14 @@ async function run() {
     //get top selling product
     app.get("/top-selling", async (req, res) => {
       const result = await topSellingCollection.find({}).toArray();
+      res.send(result);
+    });
+
+    //get top selling products by id
+    app.get("/topSelling/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await topSellingCollection.find(query).toArray();
       res.send(result);
     });
 
@@ -300,7 +318,7 @@ async function run() {
 run().catch(console.dir);
 
 app.get("/", (req, res) => {
-  res.send("server running");
+  res.send("server running check");
 });
 
 app.listen(port, () => {
