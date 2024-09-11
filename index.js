@@ -48,6 +48,7 @@ async function run() {
     const productsCollection = client.db("userProduct").collection("products");
     const bookingsCollection = client.db("userProduct").collection("bookings");
     const paymentsCollection = client.db("userProduct").collection("payments");
+    const usersCollection = client.db("userProduct").collection("users");
     const newArrivalCollection = client
       .db("userProduct")
       .collection("newProducts");
@@ -108,7 +109,7 @@ async function run() {
 
       const filter = { email: email };
       const option = { upsert: true };
-
+      
       const userinfo = {
         email: user.email,
         name: user.name,
@@ -119,7 +120,7 @@ async function run() {
       res.send(result);
     });
 
-    //get users
+    //get all users
     app.get("/users", async (req, res) => {
       const result = await usersCollection.find({}).toArray();
       res.send(result);
@@ -157,6 +158,7 @@ async function run() {
       const option = { upsert: true };
       const updateProduct = {
         $set: {
+          category: product.category,
           name: product.name,
           price: product.price,
           quantity: product.quantity,
