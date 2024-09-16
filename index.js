@@ -62,6 +62,24 @@ async function run() {
       res.send(result);
     });
 
+    //price high to law
+    app.get("/priceHigh", async (req, res) => {
+      const data = await productsCollection
+        .find({})
+        .sort({ price: -1 })
+        .toArray();
+      res.send(data);
+    });
+    
+    //price low to high
+    app.get("/priceLow", async (req, res) => {
+      const data = await productsCollection
+        .find({})
+        .sort({ price: 1 })
+        .toArray();
+      res.send(data);
+    });
+
     //get product for payment completed by email
     app.get("/paymentDone", async (req, res) => {
       const email = req.query.email;
@@ -109,7 +127,7 @@ async function run() {
 
       const filter = { email: email };
       const option = { upsert: true };
-      
+
       const userinfo = {
         email: user.email,
         name: user.name,
