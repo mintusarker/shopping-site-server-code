@@ -70,7 +70,7 @@ async function run() {
         .toArray();
       res.send(data);
     });
-    
+
     //price low to high
     app.get("/priceLow", async (req, res) => {
       const data = await productsCollection
@@ -192,6 +192,31 @@ async function run() {
       res.send(result);
     });
 
+    //update product quantity
+    app.patch("/product", async (req, res) => {
+      const data = req.body;
+      const id = data.id;
+      const filter = { _id: new ObjectId(id) };
+      const quantity = data?.quantity;
+      console.log(quantity);
+      const product = await productsCollection.find({}).toArray();
+      // const filter = product.filter((pro) => pro?._id == id);
+
+      const options = { upsert: true };
+      const updateProduct = {
+        $set: {
+          quantity: quantity,
+        },
+      };
+      const result = await productsCollection.updateOne(
+        filter,
+        updateProduct,
+        options
+      );
+      console.log(result);
+      res.send(result);
+    });
+
     //delete product
     app.delete("/products/:id", verifyJWT, async (req, res) => {
       const id = req.params.id;
@@ -201,7 +226,7 @@ async function run() {
     });
 
     //booking
-    app.post("/bookings", verifyJWT, async (req, res) => {
+    app.post("/bookings", async (req, res) => {
       const booking = req.body;
       console.log(booking);
       const result = await bookingsCollection.insertOne(booking);
