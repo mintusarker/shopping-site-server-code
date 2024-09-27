@@ -199,8 +199,6 @@ async function run() {
       const filter = { _id: new ObjectId(id) };
       const quantity = data?.quantity;
       console.log(quantity);
-      const product = await productsCollection.find({}).toArray();
-      // const filter = product.filter((pro) => pro?._id == id);
 
       const options = { upsert: true };
       const updateProduct = {
@@ -213,7 +211,50 @@ async function run() {
         updateProduct,
         options
       );
-      console.log(result);
+      res.send(result);
+    });
+
+    //update top selling product quantity
+    app.patch("/product-topSell", async (req, res) => {
+      const data = req.body;
+      const id = data.id;
+      const filter = { _id: new ObjectId(id) };
+      const quantity = data?.quantity;
+      console.log(quantity);
+
+      const options = { upsert: true };
+      const updateProduct = {
+        $set: {
+          quantity: quantity,
+        },
+      };
+      const result = await topSellingCollection.updateOne(
+        filter,
+        updateProduct,
+        options
+      );
+      res.send(result);
+    });
+
+    //update new arrival product quantity
+    app.patch("/product-newArrival", async (req, res) => {
+      const data = req.body;
+      const id = data.id;
+      const filter = { _id: new ObjectId(id) };
+      const quantity = data?.quantity;
+      console.log(quantity);
+
+      const options = { upsert: true };
+      const updateProduct = {
+        $set: {
+          quantity: quantity,
+        },
+      };
+      const result = await newArrivalCollection.updateOne(
+        filter,
+        updateProduct,
+        options
+      );
       res.send(result);
     });
 
