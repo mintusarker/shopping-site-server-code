@@ -364,6 +364,15 @@ async function run() {
       res.send(result);
     });
 
+    //get admin email
+    app.get("/user/admin/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const user = await usersCollection.findOne(query).toArray();
+      const admin = user?.role === "Admin";
+      res.send({ isAdmin: admin });
+    });
+
     //payment method ----stripe
     app.post("/create-payment-intent", verifyJWT, async (req, res) => {
       const booking = req.body;
