@@ -88,6 +88,12 @@ async function run() {
       res.send(result);
     });
 
+    //get All payment
+    app.get("/payment", async (req, res) => {
+      const result = await paymentsCollection.find({}).toArray();
+      res.send(result);
+    });
+
     //search API
     app.get("/search/:key", async (req, res) => {
       const data = await productsCollection
@@ -275,7 +281,7 @@ async function run() {
     });
 
     //get all booking
-    app.get("/bookings", async (req, res) => {
+    app.get("/all_bookings", async (req, res) => {
       const result = await bookingsCollection.find({}).toArray();
       res.send(result);
     });
