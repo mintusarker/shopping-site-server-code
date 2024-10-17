@@ -43,7 +43,7 @@ function verifyJWT(req, res, next) {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const productsCollection = client.db("userProduct").collection("products");
     const bookingsCollection = client.db("userProduct").collection("bookings");
@@ -82,6 +82,14 @@ async function run() {
 
     //get product for payment completed by email
     app.get("/paymentDone", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const result = await paymentsCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    //get payment by user email
+    app.get("/payment-by-user/:email", async (req, res) => {
       const email = req.query.email;
       const query = { email: email };
       const result = await paymentsCollection.find(query).toArray();
